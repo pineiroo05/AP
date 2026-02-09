@@ -1,0 +1,4 @@
+1. Properties-CCompiler-Include dir-"C:/opencv/include"
+2. Linker-Addit.Lib.Dir-"C:/opencv.../x64"
+	 -Libraries-Libraries-Add lib files-"opencv-world300.dll"
+3. Run-Run command-"OUTPUT PATH" img.jpg
