@@ -1,0 +1,11 @@
+# Directorios de compilacion generados por NetBeans 8.2
+build/
+dist/
+nbproyect/private/
+# Archivos de dependencias
+.dep.inc
+*.o
+*.exe
+# Archivos temporales
+.DS_Store
+Thumbs.db
