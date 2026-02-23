@@ -32,9 +32,13 @@ int main(int argc, char **argv) {
     IplImage* ImgGREEN = cvCreateImage(cvSize(Img->width, Img->height), IPL_DEPTH_8U, 3);
     IplImage* ImgRED = cvCreateImage(cvSize(Img->width, Img->height), IPL_DEPTH_8U, 3);
     IplImage* ImgMitad = cvCreateImage(cvSize(Img->width, Img->height), IPL_DEPTH_8U, 3);
+    IplImage* ImgMitad2 = cvCreateImage(cvSize(Img->width, Img->height), IPL_DEPTH_8U, 3);
     IplImage* ImgGris = cvCreateImage(cvSize(256, 256), IPL_DEPTH_8U, 1);
     IplImage* ImgApilada = cvCreateImage(cvSize(Img->width, (Img->height)*4), IPL_DEPTH_8U, 3);
     IplImage* ImgMarco = cvCreateImage(cvSize((Img->width)+ANADIDO,(Img->height)+ANADIDO), IPL_DEPTH_8U, 3);
+    IplImage* Tablero1 = cvCreateImage(cvSize(512, 512), IPL_DEPTH_8U, 1);
+    IplImage* Tablero3 = cvCreateImage(cvSize(512, 512), IPL_DEPTH_8U, 3);
+    IplImage* Tablero4 = cvCreateImage(cvSize(512, 512), IPL_DEPTH_8U, 4);
     
     int fila, columna;
 
@@ -60,7 +64,7 @@ int main(int argc, char **argv) {
         }
     }
     
-    //EJERCICIO 2 MITADES
+    //EJERCICIO MITADES 1
     for(fila=0; fila<(Img->height)/2; fila++){
         unsigned char *pImg=(unsigned char *)(Img->imageData+(fila+(Img->height/2))*Img->widthStep);
         unsigned char *pImgMitad=(unsigned char *)(ImgMitad->imageData+fila*ImgMitad->widthStep);
@@ -78,6 +82,27 @@ int main(int argc, char **argv) {
             *pImgMitad++=*pImg++;
             *pImgMitad++=*pImg++;
             *pImgMitad++=*pImg++;
+        }
+    }
+    
+    //EJERCICIO MITADES 2
+    for(fila=0; fila<(Img->height); fila++){
+        unsigned char *pImg=(unsigned char *)(Img->imageData+(fila)*Img->widthStep+(Img->width*Img->nChannels)/2);
+        unsigned char *pImgMitad2=(unsigned char *)(ImgMitad2->imageData+(fila)*ImgMitad2->widthStep);
+        for(columna=0; columna<(Img->width)/2; columna++){
+            *pImgMitad2++=*pImg++;
+            *pImgMitad2++=*pImg++;
+            *pImgMitad2++=*pImg++;            
+        }
+    }
+    
+    for(fila=0; fila<(Img->height); fila++){
+        unsigned char *pImg=(unsigned char *)(Img->imageData+fila*Img->widthStep);
+        unsigned char *pImgMitad2=(unsigned char *)(ImgMitad2->imageData+fila*ImgMitad2->widthStep+(Img->width*Img->nChannels)/2);
+        for(columna=0; columna<(Img->width)/2; columna++){
+            *pImgMitad2++=*pImg++;
+            *pImgMitad2++=*pImg++;
+            *pImgMitad2++=*pImg++;
         }
     }
     
@@ -123,11 +148,39 @@ int main(int argc, char **argv) {
     //EJERCICIO MARCO
     for(fila=0; fila<(Img->height); fila++){
         unsigned char *pImg=(unsigned char *)(Img->imageData+fila*Img->widthStep);
-        unsigned char *pImgMarco=(unsigned char *)(ImgMarco->imageData+(fila+(ANADIDO/2))*ImgMarco->widthStep+(ANADIDO/2)*3); //x3 pq me tengo que desplazar 3 bytes
+        unsigned char *pImgMarco=(unsigned char *)(ImgMarco->imageData+(fila+(ANADIDO/2))*ImgMarco->widthStep+(ANADIDO/2)*Img->nChannels);
         for(columna=0; columna<(Img->width); columna++){
             *pImgMarco++=*pImg++;
             *pImgMarco++=*pImg++;
             *pImgMarco++=*pImg++;
+        }
+    }
+    
+    //TABLEROS
+    int tamCuadro = 64; //Viene de 512/8
+    unsigned char color;
+    
+    for(fila=0; fila<(Tablero1->height); fila++){
+        unsigned char *pTablero1=(unsigned char *)(Tablero1->imageData+fila*Tablero1->widthStep);
+        unsigned char *pTablero3=(unsigned char *)(Tablero3->imageData+fila*Tablero3->widthStep);
+        unsigned char *pTablero4=(unsigned char *)(Tablero4->imageData+fila*Tablero4->widthStep);
+        for(columna=0; columna<(Tablero1->width); columna++){
+            if(((fila/tamCuadro)+(columna/tamCuadro))%2 == 0){
+                color = 255;
+            }else{
+                color = 0;
+            }
+            //Tablero 1 canal
+            *pTablero1++=color;
+            //Tablero 3 canales
+            *pTablero3++=color;
+            *pTablero3++=color;
+            *pTablero3++=color;
+            //Tablero 4 canales
+            *pTablero4++=color;
+            *pTablero4++=color;
+            *pTablero4++=color;
+            *pTablero4++=color;
         }
     }
 
@@ -139,8 +192,10 @@ int main(int argc, char **argv) {
     cvNamedWindow("Componente RED", CV_WINDOW_AUTOSIZE);
     cvShowImage("Componente RED", ImgRED);
     cvWaitKey(0);
-    cvNamedWindow("Ejercicio mitad", CV_WINDOW_AUTOSIZE);
-    cvShowImage("Ejercicio mitad", ImgMitad);
+    cvNamedWindow("Ejercicio mitad 1", CV_WINDOW_AUTOSIZE);
+    cvShowImage("Ejercicio mitad 1", ImgMitad);
+    cvNamedWindow("Ejercicio mitad 2", CV_WINDOW_AUTOSIZE);
+    cvShowImage("Ejercicio mitad 2", ImgMitad2);
     cvWaitKey(0);
     cvNamedWindow("Imagen gris", CV_WINDOW_AUTOSIZE);
     cvShowImage("Imagen gris", ImgGris);
@@ -151,24 +206,39 @@ int main(int argc, char **argv) {
     cvNamedWindow("Imagen marco", CV_WINDOW_AUTOSIZE);
     cvShowImage("Imagen marco", ImgMarco);
     cvWaitKey(0);
+    cvNamedWindow("Talero 1 canal", CV_WINDOW_AUTOSIZE);
+    cvShowImage("Tablero 1 canal", Tablero1);
+    cvNamedWindow("Tablero 3 canales", CV_WINDOW_AUTOSIZE);
+    cvShowImage("Tablero 3 canales", Tablero3);
+    cvNamedWindow("Tablero 4 canales", CV_WINDOW_AUTOSIZE);
+    cvShowImage("Tablero 4 canales", Tablero4);
+    cvWaitKey(0); 
 
     cvReleaseImage(&Img);
     cvReleaseImage(&ImgBLUE);
     cvReleaseImage(&ImgGREEN);
     cvReleaseImage(&ImgRED);
     cvReleaseImage(&ImgMitad);
+    cvReleaseImage(&ImgMitad2);
     cvReleaseImage(&ImgGris);
     cvReleaseImage(&ImgApilada);
     cvReleaseImage(&ImgMarco);
+    cvReleaseImage(&Tablero1);
+    cvReleaseImage(&Tablero3);
+    cvReleaseImage(&Tablero4);
     
     cvDestroyWindow(argv[1]);
     cvDestroyWindow("Componente BLUE");
     cvDestroyWindow("Componente GREEN");
     cvDestroyWindow("Componente RED");
     cvDestroyWindow("Ejercicio mitad");
+    cvDestroyWindow("Ejercicio mitad 2");
     cvDestroyWindow("Imagen gris");
     cvDestroyWindow("Componentes apiladas");
     cvDestroyWindow("Imagen marco");
+    cvDestroyWindow("Tablero 1 canal");
+    cvDestroyWindow("Tablero 3 canales");
+    cvDestroyWindow("Tablero 4 canales");
     
     return EXIT_SUCCESS;
 }

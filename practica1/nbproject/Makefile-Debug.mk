@@ -52,13 +52,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L../../../../../opencv3.0.0/x64 ../../../../../opencv3.0.0/x64/opencv_world300.dll
+LDLIBSOPTIONS=-L/cygdrive/C/opencv3.0.0/x64 /cygdrive/C/opencv3.0.0/x64/opencv_world300.dll
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/practica1.exe
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/practica1.exe: ../../../../../opencv3.0.0/x64/opencv_world300.dll
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/practica1.exe: /cygdrive/C/opencv3.0.0/x64/opencv_world300.dll
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/practica1.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -67,7 +67,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/practica1.exe: ${OBJECTFILES}
 ${OBJECTDIR}/main.o: main.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.c) -g -I../../../../../opencv3.0.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
+	$(COMPILE.c) -g -I/cygdrive/C/opencv3.0.0/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.c
 
 # Subprojects
 .build-subprojects:

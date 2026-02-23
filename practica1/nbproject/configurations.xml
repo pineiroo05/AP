@@ -37,15 +37,15 @@
       <compileType>
         <cTool>
           <incDir>
-            <pElem>../../../../../opencv3.0.0/include</pElem>
+            <pElem>C:/opencv3.0.0/include</pElem>
           </incDir>
         </cTool>
         <linkerTool>
           <linkerAddLib>
-            <pElem>../../../../../opencv3.0.0/x64</pElem>
+            <pElem>C:/opencv3.0.0/x64</pElem>
           </linkerAddLib>
           <linkerLibItems>
-            <linkerLibFileItem>../../../../../opencv3.0.0/x64/opencv_world300.dll</linkerLibFileItem>
+            <linkerLibFileItem>C:/opencv3.0.0/x64/opencv_world300.dll</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
