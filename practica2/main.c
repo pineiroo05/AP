@@ -38,8 +38,8 @@ int main(int argc, char** argv) {
     IplImage* fundido2=cvCloneImage(Img1);
     IplImage* fundido3=cvCreateImage(cvSize(Img1->width, Img1->height), IPL_DEPTH_8U, Img1->nChannels);
     IplImage* fundido4=cvCreateImage(cvSize(Img1->width, Img1->height), IPL_DEPTH_8U, Img1->nChannels);
-    IplImage* fundido5=cvCreateImage(cvSize(Img1->width, Img1->height), IPL_DEPTH_8U, Img1->nChannels);
-    IplImage* fundido6=cvCreateImage(cvSize(Img1->width, Img1->height), IPL_DEPTH_8U, Img1->nChannels);
+    IplImage* fundido5=cvCloneImage(Img2);
+    IplImage* fundido6=cvCloneImage(Img2);
     IplImage* copia=cvCreateImage(cvSize(Img1->width, Img1->height), IPL_DEPTH_8U, Img1->nChannels);
     int fila, columna, x;
     
@@ -117,23 +117,53 @@ int main(int argc, char** argv) {
         cvWaitKey(1);
     }
     
-    /*FUNDIDO ENCADENADO SIN SSE. NO VA BIEN
-    En el Fundido Encadenado, la imagen inicial se va desvaneciendo mientras va apareciendo la imagen final. Se
-    puede hacer sumando una imagen obtenida del Fundido a Negro de la imagen inicial con una imagen proveniente
-    del Fundido desde Negro con la imagen final*/
-    
-    IplImage* copiaImagen1=cvCloneImage(Img1);
-    IplImage* copiaImagen2=cvCloneImage(Img2);
+    //FUNDIDO ENCADENADO SIN SSE
     for(x=0; x<256; x++){
-        for(fila=0; fila<fundido5->height; fila++){
-            unsigned char *pImg1=(unsigned char *)(copiaImagen1->imageData+fila*copiaImagen1->widthStep);
-            unsigned char *pImg2=(unsigned char *)(Img2->imageData+fila*Img2->widthStep);
-            for(columna=0; columna<fundido5->widthStep; columna++){
+        for(fila=0; fila<Img2->height; fila++){
+            unsigned char *pImg1=(unsigned char *)(Img1->imageData+fila*Img1->widthStep);
+            unsigned char *pFundido5=(unsigned char *)(fundido5->imageData+fila*fundido5->widthStep);
+            for(columna=0; columna<Img2->widthStep; columna++){
+                if((*pFundido5)<(*pImg1)){
+                    (*pFundido5)++;
+                }else if((*pFundido5)>(*pImg1)){
+                    (*pFundido5)--;
+                }else{
+                    (*pFundido5)=(*pImg1);
+                }
+                *pImg1++;
+                *pFundido5++;
+            }
+        }   
+        cvNamedWindow("fundido encadenado sin sse", CV_WINDOW_AUTOSIZE);
+        cvShowImage("fundido encadenado sin sse", fundido5);
+        cvWaitKey(1);
+    }
+    
+    //FUNDIDO ENCADENADO CON SSE
+    for(x=0; x<256; x++){
+        for(fila=0; fila<Img2->height; fila++){
+            __m128i *pImg1=(__m128i *)(Img1->imageData+fila*Img1->widthStep);
+            __m128i *pFundido6=(__m128i *)(fundido6->imageData+fila*fundido6->widthStep);
+            for(columna=0; columna<Img2->widthStep; columna+=16){
+                __m128i objetivo=_mm_loadu_si128(pImg1);
+                __m128i actual=_mm_loadu_si128(pFundido6);               
+                __m128i B=_mm_set1_epi8(1);
+                //Si (*pFundido6)<(*pImg1)
+                __m128i diferencia1=_mm_subs_epu8(objetivo,actual);
+                __m128i anadido=_mm_min_epu8(diferencia1,B);
+                actual=_mm_adds_epu8(actual,anadido);
+                //Si (*pFundido6)>(*pImg1)
+                __m128i diferencia2=_mm_subs_epu8(actual,objetivo);
+                __m128i sustraccion=_mm_min_epu8(diferencia2,B);
+                actual=_mm_subs_epu8(actual,sustraccion);
                 
+                _mm_storeu_si128(pFundido6,actual);
+                *pImg1++;
+                *pFundido6++;
             }
         }
-        cvNamedWindow("Fundido encadenado sin sse", CV_WINDOW_NORMAL);
-        cvShowImage("Fundido encadenado sin sse", fundido5);
+        cvNamedWindow("fundido encadenado con sse", CV_WINDOW_AUTOSIZE);
+        cvShowImage("fundido encadenado con sse", fundido6);
         cvWaitKey(1);
     }
     
