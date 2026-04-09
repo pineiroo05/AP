@@ -74,18 +74,23 @@ int main(int argc, char** argv) {
         __m128i *parteOriginal=(__m128i *)(ejercicio2->imageData+fila*ejercicio2->widthStep);
         __m128i *parteRoja=(__m128i *)(ejercicio2->imageData+fila*ejercicio2->widthStep+(Img1->width*Img1->nChannels));
         __m128i *parteVerde=(__m128i *)(ejercicio2->imageData+(fila+Img1->height)*ejercicio2->widthStep+(Img1->width*Img1->nChannels));
-        __m128i *parteAzul=(__m128i *)(ejercicio2->imageData+(fila+2*(Img1->height))*ejercicio2->widthStep+(Img1->width*Img1->nChannels));
+        __m128i *parteAzul=(__m128i *)(ejercicio2->imageData+(fila+2*(Img1->height))*ejercicio2->widthStep+(Img1->width*Img1->nChannels));        
         for(columna=0; columna<Img1->widthStep; columna+=16){
+            __m128i datos=_mm_loadu_si128(pImg1);
             //original
-            *parteOriginal++=_mm_and_si128(_mm_set1_epi32(0xFFFFFF), *pImg1);
+            _mm_storeu_si128(parteOriginal, _mm_and_si128(_mm_set1_epi32(0xFFFFFF),datos));
             //rojo
-            *parteRoja++=_mm_and_si128(mascaraRojo, *pImg1);
+            _mm_storeu_si128(parteRoja, _mm_and_si128(mascaraRojo, datos));
             //verde 
-            *parteVerde++=_mm_and_si128(mascaraVerde, *pImg1);
+            _mm_storeu_si128(parteVerde, _mm_and_si128(mascaraVerde, datos));
             //azul
-            *parteAzul++=_mm_and_si128(mascaraAzul, *pImg1);
+            _mm_storeu_si128(parteAzul, _mm_and_si128(mascaraAzul, datos));
             
             *pImg1++;
+            *parteOriginal++;
+            *parteRoja++;
+            *parteVerde++;
+            *parteAzul++;
         }
     }
     cvNamedWindow("ejercicio 2", CV_WINDOW_NORMAL);
